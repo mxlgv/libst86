@@ -1,0 +1,6 @@
+---
+BasedOnStyle: Google
+BreakBeforeBraces: Linux
+ColumnLimit: 100
+IndentWidth: 4
+SortIncludes: Never

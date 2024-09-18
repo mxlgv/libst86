@@ -1,0 +1,6 @@
+*.o
+*.a
+test_dyn
+test_static
+example
+.ninja_log
