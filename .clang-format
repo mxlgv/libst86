@@ -1,6 +1,8 @@
 ---
 BasedOnStyle: Google
+DerivePointerAlignment: false
+PointerAlignment: Right
 BreakBeforeBraces: Linux
-ColumnLimit: 100
+ColumnLimit: 80
 IndentWidth: 4
 SortIncludes: Never

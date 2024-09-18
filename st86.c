@@ -42,7 +42,8 @@ static uintptr_t get_stack_bottom(void)
     return stack_bottom_addr;
 }
 
-static stack_frame_t *get_next_frame(const stack_frame_t *stack_frame, uintptr_t stack_bottom_addr)
+static stack_frame_t *get_next_frame(const stack_frame_t *stack_frame,
+                                     uintptr_t stack_bottom_addr)
 {
     if ((uintptr_t)stack_frame->next_frame < (uintptr_t)stack_frame ||
         (uintptr_t)stack_frame->next_frame > stack_bottom_addr) {
@@ -55,14 +56,10 @@ static stack_frame_t *get_next_frame(const stack_frame_t *stack_frame, uintptr_t
 void st86_stacktrace(size_t depth, FILE *stream)
 {
     const stack_frame_t *stack_frame = st86_get_frame_addr();
-
     const uintptr_t stack_bottom_addr = get_stack_bottom();
-    if (!stack_bottom_addr) {
-        fputs("Failed to get stack bottom address!\n", stream);
-        return;
-    }
 
-    for (size_t frame_count = 0; stack_frame && frame_count < depth; frame_count++) {
+    for (size_t frame_count = 0; stack_frame && frame_count < depth;
+         frame_count++) {
         Dl_info info;
         if (dladdr((void *)stack_frame->ret_addr, &info)) {
             if (info.dli_fname) {
@@ -79,13 +76,16 @@ void st86_stacktrace(size_t depth, FILE *stream)
             uintptr_t ret_addr_diff;
             if (info.dli_saddr) {
                 if (stack_frame->ret_addr >= (uintptr_t)info.dli_saddr) {
-                    ret_addr_diff = stack_frame->ret_addr - (uintptr_t)info.dli_saddr;
+                    ret_addr_diff =
+                        stack_frame->ret_addr - (uintptr_t)info.dli_saddr;
                 } else {
-                    ret_addr_diff = (uintptr_t)info.dli_saddr - stack_frame->ret_addr;
+                    ret_addr_diff =
+                        (uintptr_t)info.dli_saddr - stack_frame->ret_addr;
                     sign = '-';
                 }
             } else {
-                ret_addr_diff = stack_frame->ret_addr - (uintptr_t)info.dli_fbase;
+                ret_addr_diff =
+                    stack_frame->ret_addr - (uintptr_t)info.dli_fbase;
             }
 
             fprintf(stream, "%c0x%" PRIxPTR ") ", sign, ret_addr_diff);

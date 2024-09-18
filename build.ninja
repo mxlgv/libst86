@@ -33,7 +33,7 @@ build test_static: cl test.c libst86.a | st86.h
 build example: cl example.c libst86.a | st86.h
   lflags = -rdynamic
 
-build clang-format: clang-format st86.c st86.h test.c example.c
+build clang-format: clang-format test.c example.c st86.c st86.h
 
 build tests: tests | test_dyn test_static
 
