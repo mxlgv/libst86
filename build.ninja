@@ -1,18 +1,9 @@
 cc = gcc
 cflags = -Wall -Wextra -Werror -Wpedantic -std=c99 -fno-omit-frame-pointer
-nasm_obj_format = elf64
+lflags = -rdynamic
 
 rule c
-  command = $cc $cflags -c $in -o $out
-
-rule cl
   command = $cc $cflags $lflags $in -o $out
-
-rule asm
-  command = nasm -f $nasm_obj_format $in -o $out
-
-rule ar
-  command = ar -crs $out $in
 
 rule tests
   command = ./test_dyn ; ./test_static
@@ -20,21 +11,12 @@ rule tests
 rule clang-format
   command = clang-format -i $in
 
-build st86.o: c st86.c | st86.h
-build frame_addr.o: asm frame_addr.asm
-build libst86.a: ar st86.o frame_addr.o
-
-build test_dyn: cl test.c libst86.a | st86.h
-  lflags = -rdynamic
-
-build test_static: cl test.c libst86.a | st86.h
+build test_dyn: c test.c | st86.h
+build test_static: c test.c | st86.h
   lflags = -static
 
-build example: cl example.c libst86.a | st86.h
-  lflags = -rdynamic
-
-build clang-format: clang-format test.c example.c st86.c st86.h
-
+build example: c example.c | st86.h
+build clang-format: clang-format test.c example.c st86.h
 build tests: tests | test_dyn test_static
 
-default libst86.a example
+default example

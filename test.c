@@ -3,8 +3,7 @@
  * Copyright (c) 2024 Maxim Logaev
  */
 
-// Test of the libst86 library using glibc backtrace functions
-// working on the same principle as libst86.
+/* Test of the st86.h using glibc backtrace functions. */
 
 #define _GNU_SOURCE
 
@@ -18,11 +17,13 @@
 
 #include "st86.h"
 
-// Always enable assertion.
+/* Always enable assertion. */
 #undef NDEBUG
 
-// Request backtrace depth.
-// Placed as a global variable so as not to pass it through multiple calls.
+/*
+ * Request backtrace depth.
+ * Placed as a global variable so as not to pass it through multiple calls.
+ */
 size_t depth_requested = 0;
 
 void test_main(void)
@@ -89,7 +90,7 @@ void test_main(void)
 // Test call tree:
 void dummy_func6(void) { test_main(); }
 void dummy_func5(void) { dummy_func6(); }
-void dummy_func4(void) { dummy_func5(); }
+__attribute__((visibility("hidden"))) void dummy_func4(void) { dummy_func5(); }
 void dummy_func3(void) { dummy_func4(); }
 void dummy_func2(void) { dummy_func3(); }
 void dummy_func1(void) { dummy_func2(); }
@@ -99,14 +100,10 @@ int main(void)
     setbuf(stdout, NULL);
 
     puts("--- Test get current frame ----");
-#if defined(__GNUC__) || defined(__clang__)
-    printf("frame_addr: %p == %p\n", st86_get_frame_addr(),
+    printf("frame_addr: %p == %p\n", (void *)st86_get_frame_addr(),
            __builtin_frame_address(0));
     assert(st86_get_frame_addr() == __builtin_frame_address(0));
     puts("OK");
-#else
-    puts("Not GCC or Clang! Skip.");
-#endif
 
     puts("------ Test normal depth ------");
     depth_requested = 5;
